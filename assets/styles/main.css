@@ -1,0 +1,11 @@
+body {
+  background-color: blanchedalmond;
+}
+.title {
+    color: #030303;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
