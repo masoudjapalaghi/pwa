@@ -1,10 +1,38 @@
-const version = 73;
+// Imports
+importScripts("/js/dexie.js");
+importScripts("/js/db.js");
+
+const version = 101;
 const cacheName = {
   static: `static?version=${version}`,
   dynamic: `dynamic?version=${version}`,
 };
 
-const staticAsset = ["/","/assets/styles/main.css"];
+const limitInCache = (key, size) => {
+  caches.open(key).then((cache) => {
+    cache.keys().then((keys) => {
+      if (keys.length > size) {
+        cache.delete(keys[0]).then(limitInCache(key, size));
+      }
+    });
+  });
+};
+
+const stashInCacheByLimits = (cacheName, maxItems, request, response) => {
+  caches.open(cacheName).then((cache) => {
+    cache.keys().then((keys) => {
+      if (keys.length < maxItems) {
+        cache.put(request, response);
+      } else {
+        cache.delete(keys[0]).then(() => {
+          cache.put(request, response);
+        });
+      }
+    });
+  });
+};
+
+const staticAsset = ["/", "/fallback.html", "/about.html"];
 
 self.addEventListener("install", (event) => {
   console.log("installed service worker");
@@ -31,7 +59,7 @@ self.addEventListener("activate", (event) => {
       return Promise.all(
         cacheNames.forEach((cacheName) => {
           if (!activateCacheName.includes(cacheName)) {
-            return caches.delete(cacheName); // :))
+            return caches.delete(cacheName);
           }
         })
       );
@@ -40,34 +68,32 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  console.log(event.request);
-
   // // network only
   // event.respondWith(event.request);
 
   // ****************************************************************************************************************************
 
   // // caches only
-  const url = new URL(event.request.url);
-  const isPreCachedRequest = staticAsset.includes(url.pathname);
-  console.log("isPreCachedRequest",isPreCachedRequest);
-  if (isPreCachedRequest) {
-    // Grab the precached asset from the cache
-    event.respondWith(caches.open(cacheName.static).then((cache) => {
-      return cache.match(event.request);
-    }));
-  } else {
-    // Go to the network
-    // return  event.respondWith(null);
-    return event.respondWith(event.request);
+  // const url = new URL(event.request.url);
+  // const isPreCachedRequest = staticAsset.includes(url.pathname);
+  // console.log("isPreCachedRequest",isPreCachedRequest);
+  // if (isPreCachedRequest) {
+  //   // Grab the precached asset from the cache
+  //   event.respondWith(caches.open(cacheName.static).then((cache) => {
+  //     return cache.match(event.request);
+  //   }));
+  // } else {
+  //   // Go to the network
+  //   // return  event.respondWith(null);
+  //   return event.respondWith(event.request);
 
-  }
+  // }
   // event.respondWith(caches.match(event.request));
 
   // ****************************************************************************************************************************
 
   // Cache first, falling back to network
-  // // and this advance
+  // sample
   // event.respondWith(caches.open(cacheName.dynamic).then((cache) => {
   //   // Go to the cache first
   //   return cache.match(event.request).then((cachedResponse) => {
@@ -83,9 +109,54 @@ self.addEventListener("fetch", (event) => {
 
   //       // Return the network response
   //       return fetchedResponse;
-  //     });
+  //     })
   //   });
   // }));
+
+  // advance
+  const urls = ["https://6242faeed126926d0c5a2a36.mockapi.io/mock/lists"];
+  if (urls.includes(event.request.url)) {
+    return event.respondWith(
+      fetch(event.request).then((response) => {
+        const clonedResponse = response.clone();
+        console.log(clonedResponse);
+        clonedResponse.json().then((data) => {
+          for (let product in data) {
+            db.products.put(data[product]);
+          }
+        });
+        return response;
+      })
+    );
+  } else {
+    event.respondWith(
+      caches.open(cacheName.dynamic).then((cache) => {
+        // Go to the cache first
+
+        return cache.match(event.request).then((cachedResponse) => {
+          // Return a cached response if we have one
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+
+          // Otherwise, hit the network
+          return fetch(event.request)
+            .then((fetchedResponse) => {
+              // Add the network response to the cache for later visits
+              cache.put(event.request, fetchedResponse.clone());
+              // stashInCache(cacheName.static, 3, event.request, fetchedResponse);
+              // limitInCache(cacheName.static,3)
+              // Return the network response
+              return fetchedResponse;
+            })
+            .catch((err) => {
+              // show fallback  page for This page is not cached
+              return caches.match("/fallback.html");
+            });
+        });
+      })
+    );
+  }
 
   // ****************************************************************************************************************************
 

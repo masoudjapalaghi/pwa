@@ -26,16 +26,20 @@ body {
 
 .container-custom {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  min-height: 80dvh;
+  gap: 16px;
+  flex-wrap: wrap;
+  /* min-height: 80dvh; */
   max-width: 1200px;
   margin: 0 auto;
+  padding-top: 200px;
 }
 .card {
   border-radius: 18px;
   width: 250px;
-  height: 210px;
+  /* height: 210px; */
+
   box-shadow: inset 0 0 0.5px 1px hsla(0, 0%, 100%, 0.1), /* 2. shadow ring 👇 */ 0 0 0 1px hsla(230, 13%, 9%, 0.075), /* 3. multiple soft shadows 👇 */ 0 0.3px 0.4px hsla(230, 13%, 9%, 0.02),
     0 0.9px 1.5px hsla(230, 13%, 9%, 0.045), 0 3.5px 6px hsla(230, 13%, 9%, 0.09);
   border: unset !important;
@@ -48,4 +52,6 @@ body {
 }
 .card img {
   border-radius: 18px;
+  max-height: 164px;
+  width: 100%;
 }
