@@ -1,11 +1,51 @@
+:root {
+  --color-bg: hsl(0, 0%, 100%);
+  --color-bg-light: hsl(0, 0%, 100%);
+}
+
+/* edit the variables in dark mode */
+[data-theme="dark"] {
+  --color-bg: hsl(232, 11%, 15%);
+  --color-bg-light: hsl(233, 8%, 19%);
+}
+
 body {
-  background-color: blanchedalmond;
+  background-color: #2b4162;
+  background-image: linear-gradient(315deg, #2b4162 0%, #12100e 74%);
+  min-height: 98dvh;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 .title {
-    color: #030303;
-    padding: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
+  color: #030303;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container-custom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80dvh;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.card {
+  border-radius: 18px;
+  width: 250px;
+  height: 210px;
+  box-shadow: inset 0 0 0.5px 1px hsla(0, 0%, 100%, 0.1), /* 2. shadow ring 👇 */ 0 0 0 1px hsla(230, 13%, 9%, 0.075), /* 3. multiple soft shadows 👇 */ 0 0.3px 0.4px hsla(230, 13%, 9%, 0.02),
+    0 0.9px 1.5px hsla(230, 13%, 9%, 0.045), 0 3.5px 6px hsla(230, 13%, 9%, 0.09);
+  border: unset !important;
+  color: white !important;
+  background-color: #1b2845;
+  background-image: linear-gradient(315deg, #1b2845 0%, #274060 74%);
+}
+.card-body {
+  padding: 10px;
+}
+.card img {
+  border-radius: 18px;
+}
