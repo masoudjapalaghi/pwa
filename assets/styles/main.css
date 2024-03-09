@@ -35,6 +35,27 @@ body {
   margin: 0 auto;
   padding-top: 200px;
 }
+.container_data_entry {
+  position: sticky;
+  inset: 0;
+  bottom: 40px;
+  right: 0;
+  margin: 0 auto;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.productForm,
+.productForm input {
+  border-radius: 6px;
+  background-color: #1b2845;
+  background-image: linear-gradient(315deg, #1b2845 0%, #274060 74%);
+  color: white;
+}
 .card {
   border-radius: 18px;
   width: 250px;

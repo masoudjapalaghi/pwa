@@ -2,7 +2,7 @@
 importScripts("/js/dexie.js");
 importScripts("/js/db.js");
 
-const version = 101;
+const version = 125;
 const cacheName = {
   static: `static?version=${version}`,
   dynamic: `dynamic?version=${version}`,
@@ -119,7 +119,6 @@ self.addEventListener("fetch", (event) => {
     return event.respondWith(
       fetch(event.request).then((response) => {
         const clonedResponse = response.clone();
-        console.log(clonedResponse);
         clonedResponse.json().then((data) => {
           for (let product in data) {
             db.products.put(data[product]);
@@ -187,3 +186,33 @@ self.addEventListener("fetch", (event) => {
   //   })
   // );
 });
+
+self.addEventListener("sync", (event) => {
+  console.log(event);
+  if (event.tag === "add-new-product") {
+    addNewProduct();
+  }
+});
+
+function addNewProduct() {
+  db.syncProducts.toArray().then((data) => {
+    data.forEach(async (product) => {
+      const res = await fetch("https://6242faeed126926d0c5a2a36.mockapi.io/mock/lists", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: product.title,
+        }),
+      });
+      if (res.status === 201) {
+        db.syncProducts
+          .where({ title: product.title })
+          .delete()
+          .then(() => console.log("product removed successfully from indexedDB :))"))
+          .catch((err) => console.log("Error in remove product =>", err));
+      }
+    });
+  });
+}

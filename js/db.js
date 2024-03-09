@@ -3,4 +3,5 @@ const dbVersion = 1;
 
 db.version(dbVersion).stores({
   products: "id",
+  syncProducts: "title",
 });
