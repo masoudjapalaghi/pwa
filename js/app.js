@@ -48,6 +48,34 @@ const createUi = (items) => {
     );
   });
 };
+// add Product without db
+// const productForm = document.querySelector(".productForm");
+
+// const addNewProduct = async (e) => {
+//   e.preventDefault();
+//   const nameProduct = e.target.productName.value;
+//   const newProduct = {
+//     title: nameProduct,
+//   };
+//   await fetch("https://6242faeed126926d0c5a2a36.mockapi.io/mock/lists", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(newProduct),
+//   });
+// };
+// productForm.addEventListener("submit", addNewProduct);
+
+
+
+
+
+
+
+
+
+
 
 // add Product
 const productForm = document.querySelector(".productForm");

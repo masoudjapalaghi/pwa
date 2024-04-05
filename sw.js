@@ -3,7 +3,7 @@ importScripts("/js/dexie.js");
 importScripts("/js/db.js");
 
 const version = 130;
-const cacheName = {
+const cacheNames = {
   static: `static?version=${version}`,
   dynamic: `dynamic?version=${version}`,
 };
@@ -37,7 +37,7 @@ self.addEventListener("install", (event) => {
   console.log("installed service worker");
   self.skipWaiting();
   event.waitUntil(
-    caches.open(cacheName.static).then((cache) => {
+    caches.open(cacheNames.static).then((cache) => {
       cache
         .addAll(staticAsset)
         .then((e) => {
@@ -87,27 +87,14 @@ self.addEventListener("fetch", (event) => {
   // ****************************************************************************************************************************
 
   // // caches only
-  // const url = new URL(event.request.url);
-  // const isPreCachedRequest = staticAsset.includes(url.pathname);
-  // console.log("isPreCachedRequest", isPreCachedRequest, url);
-  // if (isPreCachedRequest) {
-  //   // Grab the precached asset from the cache
-  //   event.respondWith(
-  //     caches.open(cacheNames.static).then((cache) => {
-  //       cache.addAll(staticAsset);
-  //       return cache.match(event.request);
-  //     })
-  //   );
-  // } else {
-      // network
-      // return;
-  // }
+  // event.respondWith(caches.match(event.request));
+
 
   // ****************************************************************************************************************************
 
   // Cache first, falling back to network
   // sample
-  // event.respondWith(caches.open(cacheName.dynamic).then((cache) => {
+  // event.respondWith(caches.open(cacheNames.dynamic).then((cache) => {
   //   // Go to the cache first
   //   return cache.match(event.request).then((cachedResponse) => {
   //     // Return a cached response if we have one
@@ -142,7 +129,7 @@ self.addEventListener("fetch", (event) => {
     );
   } else {
     event.respondWith(
-      caches.open(cacheName.dynamic).then((cache) => {
+      caches.open(cacheNames.dynamic).then((cache) => {
         // Go to the cache first
 
         return cache.match(event.request).then((cachedResponse) => {
@@ -156,8 +143,8 @@ self.addEventListener("fetch", (event) => {
             .then((fetchedResponse) => {
               // Add the network response to the cache for later visits
               cache.put(event.request, fetchedResponse.clone());
-              // stashInCache(cacheName.static, 3, event.request, fetchedResponse);
-              // limitInCache(cacheName.static,3)
+              // stashInCache(cacheNames.static, 3, event.request, fetchedResponse);
+              // limitInCache(cacheNames.static,3)
               // Return the network response
               return fetchedResponse;
             })
@@ -173,7 +160,7 @@ self.addEventListener("fetch", (event) => {
   // ****************************************************************************************************************************
 
   //Network first, falling back to cache
-  // event.respondWith(caches.open(cacheName.dynamic).then(async (cache) => {
+  // event.respondWith(caches.open(cacheNames.dynamic).then(async (cache) => {
   //   // Go to the network first
   //   try {
   //     const fetchedResponse = await fetch(event.request);
@@ -187,7 +174,7 @@ self.addEventListener("fetch", (event) => {
   // ****************************************************************************************************************************
 
   // Stale-while-revalidate
-  // event.respondWith(caches.open(cacheName.dynamic).then(async (cache) => {
+  // event.respondWith(caches.open(cacheNames.dynamic).then(async (cache) => {
   //   const cachedResponse = await cache.match(event.request);
   //   const fetchedResponse = fetch(event.request).then((networkResponse) => {
   //     cache.put(event.request, networkResponse.clone());
