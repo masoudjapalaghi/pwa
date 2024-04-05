@@ -2,7 +2,7 @@
 importScripts("/js/dexie.js");
 importScripts("/js/db.js");
 
-const version = 126;
+const version = 130;
 const cacheName = {
   static: `static?version=${version}`,
   dynamic: `dynamic?version=${version}`,
@@ -31,7 +31,6 @@ const stashInCacheByLimits = (cacheName, maxItems, request, response) => {
     });
   });
 };
-
 const staticAsset = ["/", "/fallback.html", "/about.html"];
 
 self.addEventListener("install", (event) => {
@@ -68,6 +67,20 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+// first introduction
+  // event.respondWith(
+  //   caches.match(event.request).then((response) => {
+  //     if (response) {
+  //       return response;
+  //     } else {
+  //       return fetch(event.request);
+  //     }
+  //   })
+  // );
+
+  // event.respondWith(caches.match(event.request));
+
+
   // // network only
   // event.respondWith(event.request);
 
@@ -76,19 +89,19 @@ self.addEventListener("fetch", (event) => {
   // // caches only
   // const url = new URL(event.request.url);
   // const isPreCachedRequest = staticAsset.includes(url.pathname);
-  // console.log("isPreCachedRequest",isPreCachedRequest);
+  // console.log("isPreCachedRequest", isPreCachedRequest, url);
   // if (isPreCachedRequest) {
   //   // Grab the precached asset from the cache
-  //   event.respondWith(caches.open(cacheName.static).then((cache) => {
-  //     return cache.match(event.request);
-  //   }));
+  //   event.respondWith(
+  //     caches.open(cacheNames.static).then((cache) => {
+  //       cache.addAll(staticAsset);
+  //       return cache.match(event.request);
+  //     })
+  //   );
   // } else {
-  //   // Go to the network
-  //   // return  event.respondWith(null);
-  //   return event.respondWith(event.request);
-
+      // network
+      // return;
   // }
-  // event.respondWith(caches.match(event.request));
 
   // ****************************************************************************************************************************
 
@@ -174,17 +187,15 @@ self.addEventListener("fetch", (event) => {
   // ****************************************************************************************************************************
 
   // Stale-while-revalidate
-  // event.respondWith(
-  //   caches.open(cacheName.dynamic).then(async (cache) => {
-  //     const cachedResponse = await cache.match(event.request);
-  //     const fetchedResponse = fetch(event.request).then((networkResponse) => {
-  //       cache.put(event.request, networkResponse.clone());
+  // event.respondWith(caches.open(cacheName.dynamic).then(async (cache) => {
+  //   const cachedResponse = await cache.match(event.request);
+  //   const fetchedResponse = fetch(event.request).then((networkResponse) => {
+  //     cache.put(event.request, networkResponse.clone());
 
-  //       return networkResponse;
-  //     });
-  //     return cachedResponse || fetchedResponse;
-  //   })
-  // );
+  //     return networkResponse;
+  //   });
+  //   return cachedResponse || fetchedResponse;
+  // }));
 });
 
 self.addEventListener("sync", (event) => {
