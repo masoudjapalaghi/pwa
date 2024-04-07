@@ -143,7 +143,7 @@ self.addEventListener("fetch", (event) => {
             .then((fetchedResponse) => {
               // Add the network response to the cache for later visits
               cache.put(event.request, fetchedResponse.clone());
-              // stashInCache(cacheNames.static, 3, event.request, fetchedResponse);
+              // stashInCacheByLimits(cacheNames.static, 3, event.request, fetchedResponse);
               // limitInCache(cacheNames.static,3)
               // Return the network response
               return fetchedResponse;
