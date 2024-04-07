@@ -2,7 +2,7 @@
 importScripts("/js/dexie.js");
 importScripts("/js/db.js");
 
-const version = 130;
+const version = 133;
 const cacheNames = {
   static: `static?version=${version}`,
   dynamic: `dynamic?version=${version}`,
