@@ -52,7 +52,7 @@ self.addEventListener("activate", (event) => {
   console.log("activate service worker");
   event.waitUntil(clients.claim());
 
-  const activateCacheName = Object.values(cacheName);
+  const activateCacheName = Object.values(cacheNames);
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
