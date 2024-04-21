@@ -2,7 +2,7 @@
 importScripts("/js/dexie.js");
 importScripts("/js/db.js");
 
-const version = 133;
+const version = 1490;
 const cacheNames = {
   static: `static?version=${version}`,
   dynamic: `dynamic?version=${version}`,
@@ -50,7 +50,7 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   console.log("activate service worker");
-  event.waitUntil(clients.claim());
+  event.waitUntil(self.clients.claim());
 
   const activateCacheName = Object.values(cacheNames);
   event.waitUntil(
@@ -67,7 +67,7 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-// first introduction
+  // first introduction
   // event.respondWith(
   //   caches.match(event.request).then((response) => {
   //     if (response) {
@@ -80,7 +80,6 @@ self.addEventListener("fetch", (event) => {
 
   // event.respondWith(caches.match(event.request));
 
-
   // // network only
   // event.respondWith(event.request);
 
@@ -88,7 +87,6 @@ self.addEventListener("fetch", (event) => {
 
   // // caches only
   // event.respondWith(caches.match(event.request));
-
 
   // ****************************************************************************************************************************
 
@@ -141,15 +139,10 @@ self.addEventListener("fetch", (event) => {
           // Otherwise, hit the network
           return fetch(event.request)
             .then((fetchedResponse) => {
-              // Add the network response to the cache for later visits
               cache.put(event.request, fetchedResponse.clone());
-              // stashInCacheByLimits(cacheNames.static, 3, event.request, fetchedResponse);
-              // limitInCache(cacheNames.static,3)
-              // Return the network response
               return fetchedResponse;
             })
             .catch((err) => {
-              // show fallback  page for This page is not cached
               return caches.match("/fallback.html");
             });
         });
@@ -186,13 +179,16 @@ self.addEventListener("fetch", (event) => {
 });
 
 self.addEventListener("sync", (event) => {
-  console.log(event);
+  console.log("tagName", event.tag);
   if (event.tag === "add-new-product") {
     addNewProduct();
+  }else if(event.tag === "delete-new-product") {
+    // 
   }
 });
 
 function addNewProduct() {
+  console.log("tagName", "test");
   db.syncProducts.toArray().then((data) => {
     data.forEach(async (product) => {
       const res = await fetch("https://6242faeed126926d0c5a2a36.mockapi.io/mock/lists", {
@@ -205,8 +201,9 @@ function addNewProduct() {
         }),
       });
       if (res.status === 201) {
+        console.info("The new product has been successfully sent to the server");
         db.syncProducts
-          .where({ title: product.title })
+          .where({ clientId: product.clientId })
           .delete()
           .then(() => console.log("product removed successfully from indexedDB :))"))
           .catch((err) => console.log("Error in remove product =>", err));

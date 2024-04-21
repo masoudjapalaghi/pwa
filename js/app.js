@@ -16,13 +16,7 @@ if ("serviceWorker" in navigator) {
 const fetchProducts = async () => {
   try {
     const res = await fetch("https://6242faeed126926d0c5a2a36.mockapi.io/mock/lists");
-    const data = await res.json();
-    const products = [];
-
-    for (let product in data) {
-      products.push(data[product]);
-    }
-    return products;
+    return await res.json();
   } catch (err) {
     return await db.products.toArray();
   }
@@ -67,41 +61,38 @@ const createUi = (items) => {
 // };
 // productForm.addEventListener("submit", addNewProduct);
 
-
-
-
-
-
-
-
-
-
-
 // add Product
 const productForm = document.querySelector(".productForm");
 
-const addNewProduct = (e) => {
+const addNewProduct = async (e) => {
   e.preventDefault();
   const nameProduct = e.target.productName.value;
 
-  if ("serviceWorker" in navigator && "SyncManager" in window) {
+  const newProduct = {
+    title: nameProduct,
+    clientId: Math.floor(Math.random() * 100000000) + 1,
+  };
+  if ("serviceWorker" in navigator && "SyncManager" in window && !navigator.onLine) {
     navigator.serviceWorker.ready.then((sw) => {
       // added to db
-      const newProduct = {
-        title: nameProduct,
-      };
       db.syncProducts
         .put(newProduct)
-        .then(() => console.log("product add to db suscefully "))
-        .catch((err) => console.log("product add to db : ", err));
+        .then(() => console.info("product add to db successfully "))
+        .catch((err) => console.error("product add to db : ", err));
 
       return sw.sync
         .register("add-new-product")
-        .then(() => console.log("Task added successfully :))"))
-        .catch((err) => console.log("Error =>", err));
+        .then(() => console.log("Task added successfully for background sync :))"))
+        .catch((err) => console.error("Error =>", err));
     });
   } else {
-    // Fetch
+    await fetch("https://6242faeed126926d0c5a2a36.mockapi.io/mock/lists", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newProduct),
+    });
   }
 };
 
