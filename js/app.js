@@ -72,7 +72,7 @@ const addNewProduct = async (e) => {
     title: nameProduct,
     clientId: Math.floor(Math.random() * 100000000) + 1,
   };
-  if ("serviceWorker" in navigator && "SyncManager" in window && !navigator.onLine) {
+  if ( !navigator.onLine && "serviceWorker" in navigator && "SyncManager" in window) {
     navigator.serviceWorker.ready.then((sw) => {
       // added to db
       db.syncProducts
